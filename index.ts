@@ -1,12 +1,11 @@
-import { Collection, Db, MongoClient, SearchIndexDescription } from "mongodb"; // bun install mongodb
-import "dotenv/config"; // bun install dotenv
+import { Collection, Db, MongoClient, SearchIndexDescription } from "mongodb";
+import "dotenv/config";
 
-// connect to your Atlas cluster
 const uri: string = process.env.URI || "mongodb://localhost:50197";
 
 const leave = () => {
   console.info(
-      "Please make to set up a local Atlas instance first: https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
+      "Please make to set up a local Atlas instance first:\nhttps://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
     )
   process.exit(1)
 }
@@ -19,7 +18,6 @@ const run = async (): Promise<void> => {
   try {
     await client.connect();
 
-    // set namespace
     const database: Db = client.db("sample_mflix");
     const coll: Collection = database.collection("movies");
 
@@ -53,7 +51,6 @@ const run = async (): Promise<void> => {
       },
     };
 
-    // run the helper method
     console.log("creating atlas search index\n");
     console.log(await coll.createSearchIndex(index));
 
@@ -69,8 +66,8 @@ const run = async (): Promise<void> => {
       { $limit: 20 },
       { $project: { _id: 0, title: 1 } },
     ];
+    
     // run pipeline
-
     console.log(
       (await coll.aggregate(pipeline).toArray()).forEach((thing) =>
         console.log(thing)

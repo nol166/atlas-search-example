@@ -4,6 +4,15 @@ import "dotenv/config"; // bun install dotenv
 // connect to your Atlas cluster
 const uri: string = process.env.URI || "mongodb://localhost:50197";
 
+const leave = () => {
+  console.info(
+      "Please make to set up a local Atlas instance first: https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
+    )
+  process.exit(1)
+}
+
+uri.includes("localhost") && uri.includes("27017") ? leave() : null 
+
 const client: MongoClient = new MongoClient(uri);
 
 const run = async (): Promise<void> => {
@@ -49,8 +58,8 @@ const run = async (): Promise<void> => {
     console.log(await coll.createSearchIndex(index));
 
     // define pipeline
-    const query: string = "mat" // the matrix autocomplete
-    const agg: Array<{}> = [
+    const query: string = "mat"; // the matrix autocomplete
+    const pipeline: Array<{}> = [
       {
         $search: {
           index: "title_index",
@@ -63,18 +72,18 @@ const run = async (): Promise<void> => {
     // run pipeline
 
     console.log(
-      (await coll.aggregate(agg).toArray()).forEach((thing) =>
+      (await coll.aggregate(pipeline).toArray()).forEach((thing) =>
         console.log(thing)
       )
     );
   } finally {
     await client.close();
   }
-}
+};
 
 try {
-  run()
-} catch(err) {
-  console.error(err)
-  throw new Error
+  run();
+} catch (err) {
+  console.error(err);
+  throw new Error();
 }

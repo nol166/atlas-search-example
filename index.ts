@@ -10,7 +10,7 @@ import "dotenv/config";
 const queryArguments: string[] = process.argv.slice(2);
 
 const query: string = queryArguments.join(" ").toString() || "";
-console.info("🎥 - query:", query);
+query ? console.info("🎥 - query:", query) : null
 
 const leave = (special?: boolean) => {
   let message: string;
@@ -18,7 +18,7 @@ const leave = (special?: boolean) => {
     ? "Please make to set up a local Atlas instance first:\nhttps://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
     : "Usage: bun run index.ts <movie title>\nExample: bun run index.ts The Matrix";
   console.log(message);
-  process.exit(1);
+  process.exit(0);
 };
 
 !queryArguments[0] ? leave(true) : null;

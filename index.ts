@@ -1,4 +1,10 @@
-import { Collection, Db, MongoClient, SearchIndexDescription } from "mongodb";
+import {
+  Collection,
+  Db,
+  MongoClient,
+  SearchIndexDescription,
+  Document,
+} from "mongodb";
 import "dotenv/config";
 
 const queryArguments: string[] = process.argv.slice(2);
@@ -64,7 +70,6 @@ const run = async (): Promise<void> => {
     console.log(await coll.createSearchIndex(index));
 
     // define pipeline
-    // const query: string = "mat"; // the matrix autocomplete
     const pipeline: Array<{}> = [
       {
         $search: {
@@ -77,11 +82,8 @@ const run = async (): Promise<void> => {
     ];
 
     // run pipeline
-    console.log(
-      (await coll.aggregate(pipeline).toArray()).forEach((thing) =>
-        console.log(thing)
-      )
-    );
+    const results: Document[] = (await coll.aggregate(pipeline).toArray())
+    console.table(results)
   } finally {
     await client.close();
   }

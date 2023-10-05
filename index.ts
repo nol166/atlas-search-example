@@ -1,16 +1,25 @@
 import { Collection, Db, MongoClient, SearchIndexDescription } from "mongodb";
 import "dotenv/config";
 
+const queryArguments: string[] = process.argv.slice(2);
+
+const query: string = queryArguments.join(" ").toString() || "";
+console.info("🎥 - query:", query);
+
+const leave = (special?: boolean) => {
+  let message: string;
+  message = !special
+    ? "Please make to set up a local Atlas instance first:\nhttps://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
+    : "Usage: bun run index.ts <movie title>\nExample: bun run index.ts The Matrix";
+  console.log(message);
+  process.exit(1);
+};
+
+!queryArguments[0] ? leave(true) : null;
+
 const uri: string = process.env.URI || "mongodb://localhost:50197";
 
-const leave = () => {
-  console.info(
-      "Please make to set up a local Atlas instance first:\nhttps://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-deploy-local/#use-atlas-search-with-a-local-atlas-deployment"
-    )
-  process.exit(1)
-}
-
-uri.includes("localhost") && uri.includes("27017") ? leave() : null 
+uri.includes("localhost") && uri.includes("27017") ? leave() : null;
 
 const client: MongoClient = new MongoClient(uri);
 
@@ -55,7 +64,7 @@ const run = async (): Promise<void> => {
     console.log(await coll.createSearchIndex(index));
 
     // define pipeline
-    const query: string = "mat"; // the matrix autocomplete
+    // const query: string = "mat"; // the matrix autocomplete
     const pipeline: Array<{}> = [
       {
         $search: {
@@ -66,7 +75,7 @@ const run = async (): Promise<void> => {
       { $limit: 20 },
       { $project: { _id: 0, title: 1 } },
     ];
-    
+
     // run pipeline
     console.log(
       (await coll.aggregate(pipeline).toArray()).forEach((thing) =>

@@ -23,7 +23,7 @@ const leave = (special?: boolean) => {
 
 !queryArguments[0] ? leave(true) : null;
 
-const uri: string = process.env.URI || "mongodb://localhost:50197";
+const uri: string = process.env.URI || ""
 
 uri.includes("localhost") && uri.includes("27017") ? leave() : null;
 
